@@ -13,26 +13,48 @@
             <p id="status">Say "Start the game" to begin</p>
         </div>
         
-        <!-- Timer Selection Buttons - Reorganized to be more compact -->
-        <div class="timer-selection">
-            <h2>Game Duration:</h2>
-            <div class="timer-buttons">
-                <button class="timer-btn" data-time="10">10s</button>
-                <button class="timer-btn" data-time="15">15s</button>
-                <button class="timer-btn active" data-time="30">30s</button>
-                <button class="timer-btn" data-time="60">60s</button>
+        <div class="controls-container">
+            <!-- Left controls column -->
+            <div class="controls-column">
+                <!-- Timer Selection Buttons -->
+                <div class="timer-selection">
+                    <h2>Game Duration:</h2>
+                    <div class="timer-buttons">
+                        <button class="timer-btn" data-time="10">10s</button>
+                        <button class="timer-btn" data-time="15">15s</button>
+                        <button class="timer-btn active" data-time="30">30s</button>
+                        <button class="timer-btn" data-time="60">60s</button>
+                    </div>
+                </div>
             </div>
-            <p class="timer-voice-hint">Say: "Set timer to X seconds"</p>
+            
+            <!-- Center controls column -->
+            <div class="controls-column center">
+                <!-- Start Game Button -->
+                <div class="start-game-container">
+                    <button id="start-game-btn" class="primary-btn">Start Game</button>
+                </div>
+            </div>
+            
+            <!-- Right controls column -->
+            <div class="controls-column">
+                <!-- Grid toggle option -->
+                <div class="grid-toggle-container">
+                    <button id="grid-toggle" class="feature-toggle">Grid Mode: OFF</button>
+                </div>
+            </div>
         </div>
         
-        <!-- Combined stats and commands for space efficiency -->
+        <!-- Compact voice command hints -->
+        <div class="voice-hints">
+            <span>Voice commands: "Start game" | "Easy/Medium/Hard" | "Stop" | "Set timer to X seconds" | "Enable/Disable grid" | Say 1-9 (with grid)</span>
+        </div>
+        
+        <!-- Stats row -->
         <div class="game-stats">
             <div class="stat-item"><span id="score">Score: 0</span></div>
             <div class="stat-item"><span id="level">Level: 1</span></div>
             <div class="stat-item"><span id="difficulty">Current difficulty: Medium</span></div>
-        </div>
-        <div class="commands">
-            <p>Voice commands: "Start game", "Easy", "Medium", "Hard", "Stop"</p>
         </div>
         
         <div id="game-area">
@@ -40,6 +62,19 @@
             <div class="in-game-timer">
                 <div id="timer-display">30</div>
                 <div class="timer-label">SECONDS LEFT</div>
+            </div>
+            
+            <!-- Grid overlay (hidden by default) -->
+            <div id="grid-overlay" class="hidden">
+                <div class="grid-cell" data-cell="1">1</div>
+                <div class="grid-cell" data-cell="2">2</div>
+                <div class="grid-cell" data-cell="3">3</div>
+                <div class="grid-cell" data-cell="4">4</div>
+                <div class="grid-cell" data-cell="5">5</div>
+                <div class="grid-cell" data-cell="6">6</div>
+                <div class="grid-cell" data-cell="7">7</div>
+                <div class="grid-cell" data-cell="8">8</div>
+                <div class="grid-cell" data-cell="9">9</div>
             </div>
         </div>
     </div>

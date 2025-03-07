@@ -4,6 +4,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     color: #333;
+    overflow-x: hidden;
 }
 
 .container {
@@ -12,9 +13,10 @@ body {
     padding: 5px;
 }
 
+/* Header - make it more compact */
 .game-header {
     text-align: center;
-    margin-bottom: 2px;
+    margin-bottom: 0;
 }
 
 .game-header h1 {
@@ -22,28 +24,186 @@ body {
     font-size: 1.6rem;
 }
 
+#status {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #007bff;
+    margin: 0 0 4px 0;
+}
+
+/* New controls container for 3-column layout */
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 5px 0;
+    padding: 5px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.controls-column {
+    flex: 1;
+    padding: 0 5px;
+}
+
+.controls-column.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Voice hints - consolidated */
+.voice-hints {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin: 2px 0;
+    padding: 2px 0;
+    font-style: italic;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Stats bar - more compact */
 .game-stats {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 15px;
     margin: 3px 0;
+    background-color: #f8f9fa;
+    padding: 4px;
+    border-radius: 8px;
 }
 
 .stat-item {
     text-align: center;
 }
 
-.commands {
+/* Start Game Button - adjusted for column layout */
+.start-game-container {
     text-align: center;
-    margin-bottom: 3px;
-    font-size: 0.8rem;
+    margin: 0;
+    padding: 0;
 }
 
+.primary-btn {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+}
+
+.primary-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.primary-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.primary-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Timer Selection - optimized for column layout */
+.timer-selection {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.timer-selection h2 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.timer-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+}
+
+.timer-btn {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timer-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.timer-btn.active {
+    background-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+/* Grid toggle - optimized for column layout */
+.grid-toggle-container {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.feature-toggle {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: #9b59b6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.feature-toggle:hover {
+    background-color: #8e44ad;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.feature-toggle.active {
+    background-color: #27ae60;
+}
+
+/* Game area - adjusted to ensure visibility */
 #game-area {
     width: 100%;
-    height: calc(100vh - 170px); /* Dynamic height calculation */
-    min-height: 300px;
+    height: calc(100vh - 150px); /* Reduced to fit controls better */
+    min-height: 250px;
     max-height: 75vh;
     background-color: #87CEEB; /* Sky blue background */
     border: 2px solid #ccc;
@@ -76,13 +236,6 @@ body {
 
 .sequence-bubble {
     border: 3px dashed white;
-}
-
-#status {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #007bff;
-    margin: 0;
 }
 
 #difficulty {
@@ -322,8 +475,8 @@ body {
 /* Timer Selection Styles */
 .timer-selection {
     text-align: center;
-    margin: 5px 0;
-    padding: 5px 10px;
+    margin: 0;
+    padding: 0;
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -334,8 +487,8 @@ body {
 }
 
 .timer-selection h2 {
-    margin: 0 10px 0 0;
-    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
     color: #2c3e50;
 }
 
@@ -343,28 +496,28 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 5px;
     margin: 0;
 }
 
 .timer-btn {
-    padding: 8px 15px;
-    font-size: 1rem;
+    padding: 6px 10px;
+    font-size: 0.9rem;
     font-weight: bold;
     background-color: #3498db;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 120px;
+    min-width: 40px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .timer-btn:hover {
     background-color: #2980b9;
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .timer-btn.active {
@@ -423,5 +576,215 @@ body {
     
     #game-area {
         height: calc(100vh - 150px);
+    }
+}
+
+/* Grid toggle button styles */
+.grid-toggle-container {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-toggle {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: #9b59b6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.feature-toggle:hover {
+    background-color: #8e44ad;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.feature-toggle.active {
+    background-color: #27ae60;
+}
+
+.grid-voice-hint {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin: 0 0 0 10px;
+    font-style: italic;
+}
+
+/* Grid overlay styles */
+#grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    pointer-events: none;
+    z-index: 50;
+}
+
+.grid-cell {
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Responsive adjustments for grid */
+@media (max-width: 768px) {
+    .grid-toggle-container {
+        flex-direction: column;
+    }
+    
+    .grid-voice-hint {
+        margin: 3px 0 0 0;
+        font-size: 0.7rem;
+    }
+    
+    .grid-cell {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid-cell {
+        font-size: 1.5rem;
+    }
+    
+    .feature-toggle {
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+}
+
+/* Start Game Button Styles */
+.start-game-container {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.primary-btn {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+}
+
+.primary-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.primary-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.primary-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.control-hint {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin: 5px 0 0 0;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .primary-btn {
+        padding: 8px 15px;
+        font-size: 1rem;
+        min-width: 130px;
+    }
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .controls-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .controls-column {
+        width: 100%;
+        padding: 2px 0;
+    }
+    
+    .timer-btn {
+        padding: 5px 8px;
+        font-size: 0.8rem;
+        min-width: 35px;
+    }
+    
+    .primary-btn {
+        padding: 8px 15px;
+        font-size: 1rem;
+        min-width: 130px;
+    }
+    
+    #game-area {
+        height: calc(100vh - 180px);
+    }
+    
+    .voice-hints {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    #status {
+        font-size: 0.8rem;
+    }
+    
+    .game-stats {
+        gap: 8px;
+        font-size: 0.8rem;
+    }
+    
+    #game-area {
+        height: calc(100vh - 190px);
+    }
+    
+    .voice-hints span {
+        display: inline-block;
+        line-height: 1.2;
     }
 }

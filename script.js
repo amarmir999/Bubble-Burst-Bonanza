@@ -11,12 +11,17 @@ let maxBubbles = 15;
 let sequenceMode = false;
 let sequenceBubbles = [];
 let currentEnvironment = "sky"; // Default environment
-let popSound, levelUpSound, winSound;
+let popSound, levelUpSound, winSound, wrongSound;
 let gameTimer = null;
 let gameTimeLimit = 30000; // Default: 30 seconds in milliseconds
 let timerDisplay = null;
 let timerInterval = null;
 let secondsRemaining = 30; // Default to 30 seconds
+let audioContext = null; // Add audio context for better audio handling
+
+// Grid mode variables
+let gridModeEnabled = false;
+let gridCells = [];
 
 // Speed settings for different difficulty levels
 const difficulties = {
@@ -48,11 +53,11 @@ function initGame() {
     gameArea = document.getElementById('game-area');
     timerDisplay = document.getElementById('timer-display');
     
+    // Initialize audio context and sounds first
+    initializeAudio();
+    
     // Initialize speech recognition
     setupSpeechRecognition();
-    
-    // Initialize audio
-    setupAudio();
     
     // Display instructions to the user
     updateStatus("Say 'Start the game' to begin");
@@ -70,18 +75,125 @@ function initGame() {
     
     // Setup timer selection buttons
     setupTimerButtons();
+    
+    // Setup grid toggle button
+    setupGridToggle();
+    
+    // Setup start game button
+    setupStartButton();
+    
+    // Initialize grid cells array
+    initializeGridCells();
+    
+    // Add an event listener to unlock audio on user interaction
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true });
+    document.addEventListener('keydown', unlockAudio, { once: true });
 }
 
-function setupAudio() {
+// Replace setupAudio with a more robust audio initialization
+function initializeAudio() {
+    // Create audio context
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        console.log("Audio context created successfully");
+    } catch (e) {
+        console.error("Failed to create audio context:", e);
+    }
+    
     // Create audio elements
     popSound = new Audio('sounds/bubblepopping.mp3');
     levelUpSound = new Audio('sounds/dersuperanton__level-up-voice.mp3');
-    winSound = new Audio('sounds/cheer.mp3');
+    winSound = new Audio('sounds/well_done.mp3');
+    wrongSound = new Audio('sounds/wrong.mp3');
     
     // Preload sounds
     popSound.load();
     levelUpSound.load();
     winSound.load();
+    wrongSound.load();
+    
+    // Add error handlers
+    popSound.onerror = () => console.error("Error loading pop sound");
+    levelUpSound.onerror = () => console.error("Error loading level up sound");
+    winSound.onerror = () => console.error("Error loading win sound");
+    wrongSound.onerror = () => console.error("Error loading wrong sound");
+}
+
+// Function to unlock audio on first user interaction
+function unlockAudio() {
+    if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+            console.log("AudioContext unlocked successfully");
+            
+            // Play a silent sound to fully unlock audio
+            const silentSound = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
+            silentSound.play().catch(e => console.error("Failed to play silent sound:", e));
+        }).catch(err => {
+            console.error("Failed to unlock audio context:", err);
+        });
+    }
+    
+    // Also try to unlock specific sound elements
+    [popSound, levelUpSound, winSound, wrongSound].forEach(sound => {
+        if (sound) {
+            const promise = sound.play();
+            if (promise) {
+                promise.then(() => {
+                    sound.pause();
+                    sound.currentTime = 0;
+                    console.log("Sound unlocked successfully");
+                }).catch(e => {
+                    console.log("Sound unlock failed, will try again later:", e);
+                });
+            }
+        }
+    });
+}
+
+// Improved sound playing functions
+function playPopSound() {
+    console.log("Attempting to play pop sound");
+    
+    // Try the simple way first
+    const sound = popSound.cloneNode();
+    sound.volume = 1.0;
+    
+    // Play with promise handling
+    const promise = sound.play();
+    if (promise) {
+        promise.catch(e => {
+            console.error("Failed to play pop sound:", e);
+            
+            // Fallback: try to unlock audio and play again
+            unlockAudio();
+            setTimeout(() => {
+                sound.play().catch(e2 => console.error("Second attempt failed:", e2));
+            }, 100);
+        });
+    }
+}
+
+function playWrongSound() {
+    console.log("Attempting to play wrong sound");
+    
+    // Try the simple way first
+    const sound = wrongSound.cloneNode();
+    sound.volume = 0.6;
+    
+    // Play with promise handling
+    const promise = sound.play();
+    if (promise) {
+        promise.catch(e => {
+            console.error("Failed to play wrong sound:", e);
+            
+            // Fallback: try to unlock audio and play again
+            unlockAudio();
+            setTimeout(() => {
+                sound.play().catch(e2 => console.error("Second attempt failed:", e2));
+            }, 100);
+        });
+    }
 }
 
 function setupSpeechRecognition() {
@@ -115,10 +227,56 @@ function setupSpeechRecognition() {
             setDifficulty("hard");
         } else if (transcript.includes("stop") || transcript.includes("end") || transcript.includes("quit")) {
             stopGame();
+        } else if (transcript.includes("enable grid") || transcript.includes("show grid")) {
+            toggleGridMode(true);
+        } else if (transcript.includes("disable grid") || transcript.includes("hide grid")) {
+            toggleGridMode(false);
         }
         
-        // Timer setting voice commands
-        // Check for "set timer to X seconds" pattern
+        // Enhanced grid number detection - check this BEFORE other patterns
+        // to prioritize number recognition for grid mode
+        if (gridModeEnabled && gameRunning) {
+            console.log("Grid mode active, checking for number commands...");
+            
+            // Improved number detection patterns
+            // 1. Direct single digit match
+            const singleDigitMatch = transcript.match(/\b([1-9])\b/);
+            
+            // 2. Number words match
+            const numberWords = {
+                'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 
+                'six': 6, 'seven': 7, 'eight': 8, 'nine': 9
+            };
+            
+            let cellNumber = null;
+            
+            // Try direct digit match first
+            if (singleDigitMatch && singleDigitMatch[1]) {
+                cellNumber = parseInt(singleDigitMatch[1]);
+                console.log(`Detected digit: ${cellNumber}`);
+            } 
+            // Then try word match
+            else {
+                for (const [word, num] of Object.entries(numberWords)) {
+                    if (transcript.includes(word)) {
+                        cellNumber = num;
+                        console.log(`Detected number word: ${word} -> ${cellNumber}`);
+                        break;
+                    }
+                }
+            }
+            
+            // If we found a valid cell number, try to pop a bubble there
+            if (cellNumber !== null && cellNumber >= 1 && cellNumber <= 9) {
+                console.log(`Attempting to pop bubble in cell ${cellNumber} via voice command`);
+                popBubbleInCell(cellNumber);
+                
+                // Return early to prevent processing other commands
+                return;
+            }
+        }
+        
+        // Timer setting voice commands - only process if we didn't handle a grid number
         const timerMatch = transcript.match(/set timer to (\d+) seconds/i);
         if (timerMatch && timerMatch[1]) {
             const seconds = parseInt(timerMatch[1]);
@@ -160,10 +318,41 @@ function setupSpeechRecognition() {
     }
 }
 
+// Add function to set up the start button
+function setupStartButton() {
+    const startButton = document.getElementById('start-game-btn');
+    if (!startButton) return;
+    
+    // Add click event listener
+    startButton.addEventListener('click', function() {
+        // Start the game if it's not already running
+        if (!gameRunning) {
+            startGame();
+        }
+    });
+    
+    // Update button state when game state changes
+    document.addEventListener('gameStateChange', function(e) {
+        if (e.detail && e.detail.running) {
+            startButton.disabled = true;
+            startButton.textContent = "Game Running";
+        } else {
+            startButton.disabled = false;
+            startButton.textContent = "Start Game";
+        }
+    });
+}
+
 function startGame() {
     if (gameRunning) return;
     
     gameRunning = true;
+    
+    // Dispatch a custom event to notify about game state change
+    document.dispatchEvent(new CustomEvent('gameStateChange', { 
+        detail: { running: true }
+    }));
+    
     score = 0;
     currentLevel = 1;
     updateScore();
@@ -198,6 +387,12 @@ function stopGame() {
     if (!gameRunning) return;
     
     gameRunning = false;
+    
+    // Dispatch a custom event to notify about game state change
+    document.dispatchEvent(new CustomEvent('gameStateChange', { 
+        detail: { running: false }
+    }));
+    
     updateStatus("Game stopped. Say 'Start the game' to begin again.");
     
     clearInterval(bubbleInterval);
@@ -228,6 +423,12 @@ function endGame(timeUp = false) {
     if (!gameRunning) return;
     
     gameRunning = false;
+    
+    // Dispatch a custom event to notify about game state change
+    document.dispatchEvent(new CustomEvent('gameStateChange', { 
+        detail: { running: false }
+    }));
+    
     clearInterval(bubbleInterval);
     
     // Clear the game timer if it exists
@@ -337,6 +538,16 @@ function createBubble() {
     
     // Add to game area
     gameArea.appendChild(bubble);
+    
+    // If grid mode is enabled, assign grid cell to bubble data attribute
+    if (gridModeEnabled) {
+        setTimeout(() => {
+            if (bubble.parentNode === gameArea) {
+                const cellNumber = getBubbleGridCell(bubble);
+                bubble.dataset.gridCell = cellNumber;
+            }
+        }, 50); // Small delay to ensure bubble is positioned correctly
+    }
 }
 
 function popBubble(bubble) {
@@ -387,12 +598,6 @@ function popBubble(bubble) {
     if (score >= currentLevel * 500) {
         increaseLevel();
     }
-}
-
-function playPopSound() {
-    // Clone the sound to allow multiple plays
-    const sound = popSound.cloneNode();
-    sound.play();
 }
 
 function updateScore(points = 0) {
@@ -520,4 +725,160 @@ function setGameTimer(seconds) {
     }
     
     console.log(`Timer set to ${seconds} seconds`);
+}
+
+// Grid mode functions
+function setupGridToggle() {
+    const gridToggleBtn = document.getElementById('grid-toggle');
+    if (!gridToggleBtn) return;
+    
+    gridToggleBtn.addEventListener('click', function() {
+        // Toggle grid mode state
+        toggleGridMode(!gridModeEnabled);
+    });
+}
+
+function toggleGridMode(enable) {
+    gridModeEnabled = enable;
+    
+    // Update button text
+    const gridToggleBtn = document.getElementById('grid-toggle');
+    if (gridToggleBtn) {
+        gridToggleBtn.textContent = `Grid Mode: ${enable ? 'ON' : 'OFF'}`;
+        
+        if (enable) {
+            gridToggleBtn.classList.add('active');
+        } else {
+            gridToggleBtn.classList.remove('active');
+        }
+    }
+    
+    // Show/hide grid overlay
+    const gridOverlay = document.getElementById('grid-overlay');
+    if (gridOverlay) {
+        if (enable) {
+            gridOverlay.classList.remove('hidden');
+        } else {
+            gridOverlay.classList.add('hidden');
+        }
+    }
+    
+    // Update status with hint
+    if (enable) {
+        updateStatus("Grid mode enabled! Say a number (1-9) to pop bubbles in that cell.");
+        console.log("Grid mode enabled:", gridModeEnabled);
+        
+        // Add a temporary highlight to grid cells to make them more noticeable
+        gridCells.forEach(cell => {
+            cell.style.transition = "background-color 0.5s, opacity 0.5s";
+            cell.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+            setTimeout(() => {
+                cell.style.backgroundColor = "transparent";
+            }, 1000);
+        });
+    } else {
+        updateStatus("Grid mode disabled. Click bubbles to pop them.");
+        console.log("Grid mode disabled:", gridModeEnabled);
+    }
+}
+
+function initializeGridCells() {
+    // Store references to all grid cells
+    gridCells = Array.from(document.querySelectorAll('.grid-cell'));
+}
+
+function getBubbleGridCell(bubble) {
+    if (!bubble) return null;
+    
+    // Get bubble position and dimensions
+    const bubbleRect = bubble.getBoundingClientRect();
+    const bubbleX = bubbleRect.left + bubbleRect.width / 2;
+    const bubbleY = bubbleRect.top + bubbleRect.height / 2;
+    
+    // Get game area position and dimensions
+    const gameAreaRect = gameArea.getBoundingClientRect();
+    
+    // Calculate relative position within game area
+    const relativeX = bubbleX - gameAreaRect.left;
+    const relativeY = bubbleY - gameAreaRect.top;
+    
+    // Calculate which cell the bubble is in (0-8)
+    const cellWidth = gameAreaRect.width / 3;
+    const cellHeight = gameAreaRect.height / 3;
+    
+    const cellX = Math.floor(relativeX / cellWidth);
+    const cellY = Math.floor(relativeY / cellHeight);
+    
+    // Convert to cell number (1-9)
+    const cellNumber = cellY * 3 + cellX + 1;
+    
+    return cellNumber;
+}
+
+function popBubbleInCell(cellNumber) {
+    if (!gameRunning || !gridModeEnabled || cellNumber < 1 || cellNumber > 9) return;
+    
+    console.log(`Attempting to pop bubble in cell ${cellNumber}`);
+    
+    // Get all bubbles in the game
+    const bubbles = Array.from(document.querySelectorAll('.bubble'));
+    
+    // Find bubbles in the specified cell
+    const bubblesInCell = bubbles.filter(bubble => {
+        const bubbleCell = getBubbleGridCell(bubble);
+        return bubbleCell === cellNumber;
+    });
+    
+    // Pop the first bubble in the cell (if any exist)
+    if (bubblesInCell.length > 0) {
+        console.log(`Found ${bubblesInCell.length} bubbles in cell ${cellNumber}, popping one`);
+        
+        const bubble = bubblesInCell[0];
+        
+        // Play pop sound with our improved function
+        playPopSound();
+        
+        bubble.classList.add('popping');
+        
+        // Add points based on bubble size (smaller = more points)
+        const points = parseInt(bubble.dataset.points) || 10;
+        updateScore(points);
+        
+        // Remove bubble after animation completes
+        setTimeout(() => bubble.remove(), 300);
+        
+        // Check if level should be increased
+        if (score >= currentLevel * 500) {
+            increaseLevel();
+        }
+        
+        // Provide feedback
+        updateStatus(`Popped bubble in cell ${cellNumber}!`);
+        setTimeout(() => {
+            if (gameRunning) {
+                updateStatus(`Grid mode: say a number (1-9) to pop bubbles`);
+            }
+        }, 1000);
+    } else {
+        console.log(`No bubbles found in cell ${cellNumber}, playing wrong sound`);
+        
+        // Play wrong sound with our improved function
+        playWrongSound();
+        
+        // If no bubbles in the cell, provide feedback
+        updateStatus(`No bubbles in cell ${cellNumber}`);
+        setTimeout(() => {
+            if (gameRunning) {
+                updateStatus(`Grid mode: say a number (1-9) to pop bubbles`);
+            }
+        }, 1000);
+    }
+}
+
+// Add new function to play wrong sound
+function playWrongSound() {
+    // Clone the sound to allow multiple plays in quick succession
+    const sound = wrongSound.cloneNode();
+    sound.volume = 0.6; // Slightly lower volume so it's not too jarring
+    sound.play();
 }
