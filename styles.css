@@ -1,0 +1,427 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.game-header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+.game-stats {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 3px 0;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.commands {
+    text-align: center;
+    margin-bottom: 3px;
+    font-size: 0.8rem;
+}
+
+#game-area {
+    width: 100%;
+    height: calc(100vh - 170px); /* Dynamic height calculation */
+    min-height: 300px;
+    max-height: 75vh;
+    background-color: #87CEEB; /* Sky blue background */
+    border: 2px solid #ccc;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 1s ease;
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    animation: float 8s infinite ease-in-out;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+}
+
+.bubble.popping {
+    animation: pop 0.3s forwards;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.sequence-bubble {
+    border: 3px dashed white;
+}
+
+#status {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #007bff;
+    margin: 0;
+}
+
+#difficulty {
+    font-size: 1rem;
+    color: #28a745;
+}
+
+#score, #level {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+#environment-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Environment styles */
+.underwater {
+    background-color: #1a4780 !important;
+}
+
+.underwater .bubble {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.space {
+    background-color: #000033 !important;
+}
+
+.space .bubble {
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+.forest {
+    background-color: #1e4d2b !important;
+}
+
+/* Confetti animation */
+.confetti {
+    position: fixed;
+    top: -10px;
+    width: 10px;
+    height: 10px;
+    z-index: 1000;
+    animation: fall linear forwards;
+    pointer-events: none;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Timer styles */
+.timer-container {
+    text-align: center;
+    margin: 5px 0;
+    padding: 5px;
+    position: relative;
+}
+
+#timer-display {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    margin: 0 auto;
+    text-align: center;
+    border: 3px solid #3498db;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.timer-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #7f8c8d;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.time-critical {
+    color: #e74c3c !important;
+    animation: pulse-warning 0.7s infinite alternate;
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.7) !important;
+}
+
+@keyframes pulse-warning {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); box-shadow: 0 0 20px rgba(231, 76, 60, 0.9); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    #timer-display {
+        font-size: 2.5rem;
+        width: 80px;
+        height: 80px;
+        line-height: 80px;
+    }
+    
+    .timer-label {
+        font-size: 0.8rem;
+    }
+}
+
+.timer-container {
+    text-align: center;
+    margin: 10px 0;
+    padding: 5px;
+    
+    #status {
+        font-size: 1rem;
+    }
+    
+    .commands {
+        font-size: 0.8rem;
+    }
+    
+    #game-area {
+        height: 70vh;
+    }
+}
+
+/* In-game timer styles */
+.in-game-timer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+#timer-display {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    margin: 0 auto;
+    text-align: center;
+    border: 4px solid #3498db;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.timer-label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.time-critical {
+    color: #e74c3c !important;
+    animation: pulse-warning 0.7s infinite alternate;
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.7) !important;
+}
+
+@keyframes pulse-warning {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); box-shadow: 0 0 20px rgba(231, 76, 60, 0.9); }
+}
+
+/* Remove the old timer container styles */
+.timer-container {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 800px) {
+    .in-game-timer {
+        top: 10px;
+        right: 10px;
+    }
+    
+    #timer-display {
+        font-size: 3rem;
+        width: 90px;
+        height: 90px;
+        line-height: 90px;
+        border-width: 3px;
+    }
+    
+    .timer-label {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .in-game-timer {
+        top: 5px;
+        right: 5px;
+    }
+    
+    #timer-display {
+        font-size: 2.5rem;
+        width: 70px;
+        height: 70px;
+        line-height: 70px;
+    }
+    
+    .timer-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Timer Selection Styles */
+.timer-selection {
+    text-align: center;
+    margin: 5px 0;
+    padding: 5px 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.timer-selection h2 {
+    margin: 0 10px 0 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.timer-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+}
+
+.timer-btn {
+    padding: 8px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timer-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.timer-btn.active {
+    background-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+.timer-voice-hint {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin: 0 0 0 10px;
+    font-style: italic;
+}
+
+/* Responsive adjustments for timer buttons */
+@media (max-width: 768px) {
+    .timer-selection {
+        flex-direction: column;
+        padding: 3px;
+    }
+    
+    .timer-selection h2 {
+        margin: 0 0 5px 0;
+        font-size: 1rem;
+    }
+    
+    .timer-btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        min-width: 90px;
+    }
+    
+    .timer-voice-hint {
+        margin: 3px 0 0 0;
+        font-size: 0.7rem;
+    }
+    
+    #game-area {
+        height: calc(100vh - 160px);
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    #status {
+        font-size: 0.9rem;
+    }
+    
+    .game-stats {
+        gap: 8px;
+        font-size: 0.8rem;
+    }
+    
+    #game-area {
+        height: calc(100vh - 150px);
+    }
+}

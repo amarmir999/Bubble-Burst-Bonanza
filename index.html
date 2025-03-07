@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Burst Bonanza</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1>Bubble Burst Bonanza</h1>
+            <p id="status">Say "Start the game" to begin</p>
+        </div>
+        
+        <!-- Timer Selection Buttons - Reorganized to be more compact -->
+        <div class="timer-selection">
+            <h2>Game Duration:</h2>
+            <div class="timer-buttons">
+                <button class="timer-btn" data-time="10">10s</button>
+                <button class="timer-btn" data-time="15">15s</button>
+                <button class="timer-btn active" data-time="30">30s</button>
+                <button class="timer-btn" data-time="60">60s</button>
+            </div>
+            <p class="timer-voice-hint">Say: "Set timer to X seconds"</p>
+        </div>
+        
+        <!-- Combined stats and commands for space efficiency -->
+        <div class="game-stats">
+            <div class="stat-item"><span id="score">Score: 0</span></div>
+            <div class="stat-item"><span id="level">Level: 1</span></div>
+            <div class="stat-item"><span id="difficulty">Current difficulty: Medium</span></div>
+        </div>
+        <div class="commands">
+            <p>Voice commands: "Start game", "Easy", "Medium", "Hard", "Stop"</p>
+        </div>
+        
+        <div id="game-area">
+            <!-- Bubbles will be created dynamically -->
+            <div class="in-game-timer">
+                <div id="timer-display">30</div>
+                <div class="timer-label">SECONDS LEFT</div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
