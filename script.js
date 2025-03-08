@@ -11,7 +11,7 @@ let maxBubbles = 15;
 let sequenceMode = false;
 let sequenceBubbles = [];
 let currentEnvironment = "sky"; // Default environment
-let popSound, levelUpSound, winSound, wrongSound;
+let popSound, levelUpSound, winSound, wrongSound, startSound;
 let gameTimer = null;
 let gameTimeLimit = 30000; // Default: 30 seconds in milliseconds
 let timerDisplay = null;
@@ -76,6 +76,9 @@ function initGame() {
     // Setup timer selection buttons
     setupTimerButtons();
     
+    // Setup difficulty buttons
+    setupDifficultyButtons();
+    
     // Setup grid toggle button
     setupGridToggle();
     
@@ -106,18 +109,21 @@ function initializeAudio() {
     levelUpSound = new Audio('sounds/dersuperanton__level-up-voice.mp3');
     winSound = new Audio('sounds/well_done.mp3');
     wrongSound = new Audio('sounds/wrong.mp3');
+    startSound = new Audio('sounds/game_start.mp3');
     
     // Preload sounds
     popSound.load();
     levelUpSound.load();
     winSound.load();
     wrongSound.load();
+    startSound.load();
     
     // Add error handlers
     popSound.onerror = () => console.error("Error loading pop sound");
     levelUpSound.onerror = () => console.error("Error loading level up sound");
     winSound.onerror = () => console.error("Error loading win sound");
     wrongSound.onerror = () => console.error("Error loading wrong sound");
+    startSound.onerror = () => console.error("Error loading start game sound");
 }
 
 // Function to unlock audio on first user interaction
@@ -127,7 +133,7 @@ function unlockAudio() {
             console.log("AudioContext unlocked successfully");
             
             // Play a silent sound to fully unlock audio
-            const silentSound = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
+            const silentSound = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
             silentSound.play().catch(e => console.error("Failed to play silent sound:", e));
         }).catch(err => {
             console.error("Failed to unlock audio context:", err);
@@ -348,6 +354,9 @@ function startGame() {
     
     gameRunning = true;
     
+    // Play start game sound
+    playStartSound();
+    
     // Dispatch a custom event to notify about game state change
     document.dispatchEvent(new CustomEvent('gameStateChange', { 
         detail: { running: true }
@@ -464,6 +473,9 @@ function setDifficulty(level) {
     
     difficultyLevel = level;
     document.getElementById('difficulty').textContent = `Current difficulty: ${level.charAt(0).toUpperCase() + level.slice(1)}`;
+    
+    // Update difficulty buttons to match current selection
+    updateDifficultyButtons();
     
     // Update the bubble interval if the game is running
     if (gameRunning) {
@@ -881,4 +893,66 @@ function playWrongSound() {
     const sound = wrongSound.cloneNode();
     sound.volume = 0.6; // Slightly lower volume so it's not too jarring
     sound.play();
+}
+
+// Add function to play start game sound
+function playStartSound() {
+    console.log("Playing start game sound");
+    
+    // Try the simple way first
+    const sound = startSound.cloneNode();
+    sound.volume = 0.8; // Slightly lower volume for better experience
+    
+    // Play with promise handling
+    const promise = sound.play();
+    if (promise) {
+        promise.catch(e => {
+            console.error("Failed to play start game sound:", e);
+            
+            // Fallback: try to unlock audio and play again
+            unlockAudio();
+            setTimeout(() => {
+                sound.play().catch(e2 => console.error("Second attempt failed:", e2));
+            }, 100);
+        });
+    }
+}
+
+// Add function to set up difficulty buttons
+function setupDifficultyButtons() {
+    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+    if (!difficultyButtons.length) return;
+    
+    // Add click event listeners to each difficulty button
+    difficultyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            difficultyButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Get difficulty value from data attribute
+            const difficulty = this.getAttribute('data-difficulty');
+            
+            // Update difficulty
+            setDifficulty(difficulty);
+        });
+    });
+    
+    // Initialize with current difficulty setting
+    updateDifficultyButtons();
+}
+
+function updateDifficultyButtons() {
+    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+    
+    // Set active class on button matching current difficulty
+    difficultyButtons.forEach(button => {
+        if (button.getAttribute('data-difficulty') === difficultyLevel) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
 }
