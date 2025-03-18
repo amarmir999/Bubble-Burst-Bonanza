@@ -26,6 +26,15 @@
                         <button class="timer-btn" data-time="60">60s</button>
                     </div>
                 </div>
+                <!-- New Parallel Bubbles Selection -->
+                <div class="parallel-selection">
+                    <h2>Max Bubbles:</h2>
+                    <div class="max-bubbles-section">
+                        <label for="maxBubblesSlider">Max Bubbles:</label>
+                        <input type="range" id="maxBubblesSlider" min="1" max="50" step="1" value="15" />
+                        <span id="maxBubblesValue">15</span>
+                    </div>
+                </div>
             </div>
             
             <!-- Center controls column -->
@@ -86,6 +95,13 @@
                 <div class="grid-cell" data-cell="8">8</div>
                 <div class="grid-cell" data-cell="9">9</div>
             </div>
+        </div>
+        
+        <!-- Game Mode Selection -->
+        <div class="mode-selection">
+            <h2>Game Mode:</h2>
+            <button class="mode-btn" data-mode="single">Single Bubble</button>
+            <button class="mode-btn" data-mode="all" disabled>All Bubbles</button>
         </div>
     </div>
     <script src="script.js"></script>

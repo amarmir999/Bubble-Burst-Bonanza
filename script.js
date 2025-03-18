@@ -2,6 +2,8 @@
 let gameRunning = false;
 let gameArea = null;
 let difficultyLevel = "medium";
+// Replace maxBubbles with custom limit from parallel selection
+let customMaxBubbles = 15;
 let bubbleInterval = null;
 let recognition = null;
 let score = 0;
@@ -18,6 +20,7 @@ let timerDisplay = null;
 let timerInterval = null;
 let secondsRemaining = 30; // Default to 30 seconds
 let audioContext = null; // Add audio context for better audio handling
+let gameMode = "all"; // New: default mode
 
 // Grid mode variables
 let gridModeEnabled = false;
@@ -75,6 +78,8 @@ function initGame() {
     
     // Setup timer selection buttons
     setupTimerButtons();
+    // setupParallelBubbleButtons(); // Removed old parallel selection
+    setupMaxBubblesSlider(); // New
     
     // Setup difficulty buttons
     setupDifficultyButtons();
@@ -92,6 +97,8 @@ function initGame() {
     document.addEventListener('click', unlockAudio, { once: true });
     document.addEventListener('touchstart', unlockAudio, { once: true });
     document.addEventListener('keydown', unlockAudio, { once: true });
+
+    setupModeSelection(); // New line
 }
 
 // Replace setupAudio with a more robust audio initialization
@@ -133,7 +140,7 @@ function unlockAudio() {
             console.log("AudioContext unlocked successfully");
             
             // Play a silent sound to fully unlock audio
-            const silentSound = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
+            const silentSound = new Audio("data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
             silentSound.play().catch(e => console.error("Failed to play silent sound:", e));
         }).catch(err => {
             console.error("Failed to unlock audio context:", err);
@@ -383,6 +390,10 @@ function startGame() {
     }, 1000);
     
     // Start creating bubbles
+    if (gameMode === "single") {
+        createSpecialBlackBubble(); // New line
+        return;
+    }
     createBubble();
     bubbleInterval = setInterval(createBubble, difficulties[difficultyLevel].spawnInterval);
     
@@ -487,10 +498,10 @@ function setDifficulty(level) {
 function createBubble() {
     if (!gameRunning) return;
     
-    const bubbleCount = document.querySelectorAll('.bubble').length;
+    const currentBubbleCount = document.querySelectorAll('.bubble').length;
     
-    // Don't create more bubbles than the maximum allowed
-    if (bubbleCount >= difficulties[difficultyLevel].maxBubbles) return;
+    // Use the custom max bubbles value selected by the user
+    if (currentBubbleCount >= customMaxBubbles) return;
     
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
@@ -609,6 +620,10 @@ function popBubble(bubble) {
     // Check if level should be increased
     if (score >= currentLevel * 500) {
         increaseLevel();
+    }
+
+    if (gameMode === "single" && bubble.dataset.special === 'true') {
+        endGame(false); // End immediately if special bubble is popped
     }
 }
 
@@ -955,4 +970,43 @@ function updateDifficultyButtons() {
             button.classList.remove('active');
         }
     });
+}
+
+// New: Setup the max bubbles slider
+function setupMaxBubblesSlider() {
+    const slider = document.getElementById('maxBubblesSlider');
+    const display = document.getElementById('maxBubblesValue');
+    if (!slider || !display) return;
+    slider.addEventListener('input', () => {
+        customMaxBubbles = parseInt(slider.value);
+        display.textContent = slider.value;
+        updateStatus(`Max Bubbles: ${slider.value}`);
+    });
+}
+
+// New function to set up mode selection buttons
+function setupModeSelection() {
+    const modeButtons = document.querySelectorAll('.mode-btn');
+    if (!modeButtons.length) return;
+    modeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            modeButtons.forEach(b => b.disabled = false);
+            this.disabled = true;
+            gameMode = this.getAttribute('data-mode');
+            updateStatus(`Game Mode: ${gameMode === "single" ? "Single Bubble" : "All Bubbles"}`);
+        });
+    });
+}
+
+// New function: create a single special black bubble
+function createSpecialBlackBubble() {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.style.backgroundColor = '#000';
+    bubble.style.width = '60px';
+    bubble.style.height = '60px';
+    bubble.dataset.special = 'true';
+    bubble.style.left = gameArea.clientWidth / 2 - 30 + 'px';
+    bubble.style.top = gameArea.clientHeight / 2 - 30 + 'px';
+    gameArea.appendChild(bubble);
 }

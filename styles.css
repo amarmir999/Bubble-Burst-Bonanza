@@ -846,3 +846,96 @@ body {
         font-size: 0.8rem;
     }
 }
+
+/* New styles for max bubbles display */
+#max-bubbles-display {
+    font-size: 0.9rem;
+    color: #2c3e50;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* Parallel Selection Styles */
+.parallel-selection {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.parallel-selection h2 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.parallel-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+}
+
+.parallel-btn {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.parallel-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.parallel-btn.active {
+    background-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+/* Mode Selection Styles */
+.mode-selection {
+    text-align: center;
+    margin: 5px 0;
+}
+
+.mode-btn {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: #9b59b6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.mode-btn:hover {
+    background-color: #8e44ad;
+}
+
+/* Max Bubbles Section */
+.max-bubbles-section {
+    text-align: center;
+    margin: 8px 0;
+}
+
+#maxBubblesSlider {
+    width: 180px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+#maxBubblesValue {
+    font-weight: bold;
+    margin-left: 8px;
+}
